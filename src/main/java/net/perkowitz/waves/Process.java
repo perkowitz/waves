@@ -164,12 +164,12 @@ public class Process {
         } else if (process.equals("subtract")) {
             Wave wave1 = inputs.get(0);
             Wave wave2 = inputs.get(1);
-            wave1.multiply(wave2);
+            wave1.subtract(wave2);
             return wave1;
         } else if (process.equals("multiply")) {
             Wave wave1 = inputs.get(0);
             Wave wave2 = inputs.get(1);
-            wave1.subtract(wave2);
+            wave1.multiply(wave2);
             return wave1;
         } else if (process.equals("append")) {
             Wave wave1 = inputs.get(0);

@@ -4,7 +4,7 @@
     <groupId>net.perkowitz</groupId>
     <artifactId>waves</artifactId>
     <version>1.0</version>
-    <name>Waves</name>
+    <name>waves</name>
 
 
     <dependencies>
