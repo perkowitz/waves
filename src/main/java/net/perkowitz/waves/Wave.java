@@ -1,0 +1,402 @@
+package net.perkowitz.waves;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Wave {
+
+    static int DEFAULT_SAMPLE_RATE = 44100;
+    static int DEFAULT_BIT_DEPTH = 15;
+    static int A440_FREQUENCY = 440;                        // reference note
+    static double SINGLE_STEP_FREQUENCY = 1.059463094359;   // 12th root of 2
+
+    private List<Double> samples;
+
+    //////////////////////////////////////////////////////////
+    // constructor
+    public Wave() {
+        samples = new ArrayList<Double>();
+    }
+
+    //////////////////////////////////////////////////////////
+    // getter/setters and utility
+    public List<Double> getSamples() {
+        return samples;
+    }
+    public Double getSample(int i) {
+        return getSamples().get(i);
+    }
+
+    public int size() {
+        return samples.size();
+    }
+
+    public void addSample(Double sample) {
+        samples.add(sample);
+    }
+
+    //////////////////////////////////////////////////////////
+    // methods
+
+    public void save(String filename) throws IOException {
+
+        BufferedWriter out = new BufferedWriter(new FileWriter(filename));
+        for (Double sample : samples) {
+            out.write(sample + "\n");
+        }
+        out.close();
+
+    }
+
+    public void pad(long length) {
+        List<Double> newSamples = new ArrayList<Double>();
+        for (int i=0; i<length; i++) {
+            newSamples.add(samples.get(i % size()));
+        }
+        samples = newSamples;
+    }
+
+    public void add(Wave wave) {
+        List<Double> newSamples = new ArrayList<Double>();
+        for (int i=0; i<size(); i++) {
+            if (i < wave.size()) {
+                newSamples.add(samples.get(i) + wave.getSamples().get(i));
+            } else {
+                newSamples.add(samples.get(i));
+            }
+        }
+        samples = newSamples;
+    }
+
+    public void subtract(Wave wave) {
+        List<Double> newSamples = new ArrayList<Double>();
+        for (int i=0; i<size(); i++) {
+            if (i < wave.size()) {
+                newSamples.add(samples.get(i) - wave.getSamples().get(i));
+            } else {
+                newSamples.add(samples.get(i));
+            }
+        }
+        samples = newSamples;
+    }
+
+    public void multiply(Wave wave) {
+        List<Double> newSamples = new ArrayList<Double>();
+        for (int i=0; i<size(); i++) {
+            if (i < wave.size()) {
+                newSamples.add(samples.get(i) * wave.getSamples().get(i));
+            } else {
+                newSamples.add(samples.get(i));
+            }
+        }
+        samples = newSamples;
+    }
+
+    public void normalize() {
+        double max = -1000;
+        double min = 1000;
+        for (Double sample : samples) {
+            if (sample > max) {
+                max = sample;
+            }
+            if (sample < min) {
+                min = sample;
+            }
+        }
+
+        // todo: this actually maps to a 0-1 range; need to map to -1 - 1
+        double range = max - min;
+        List<Double> newSamples = new ArrayList<Double>();
+        for (Double sample : samples) {
+            newSamples.add((sample - min) / range);
+        }
+        samples = newSamples;
+    }
+
+    public void clip() {
+        for (int i=0; i<size(); i++) {
+            if (samples.get(i) > 1) {
+                samples.set(i,1.0);
+            } else if (samples.get(i) < -1) {
+                samples.set(i,-1.0);
+            }
+        }
+    }
+
+    public void wrap() {
+        for (int i=0; i<size(); i++) {
+            Double sample = samples.get(i);
+            if (sample > 1) {
+                samples.set(i,sample - Math.floor(sample));
+            } else if (samples.get(i) < -1) {
+                samples.set(i,sample - Math.floor(sample) - 1);
+            }
+        }
+    }
+
+    public void append(Wave wave) {
+        for (Double sample : wave.getSamples()) {
+            samples.add(sample);
+        }
+    }
+
+    public void lowpass(int feedback) {
+
+        double alpha = 0.5;
+
+        for (int i=0; i<feedback; i++) {
+            List<Double> newSamples = new ArrayList<Double>();
+            Double prevSample = samples.get(samples.size()-1);
+            for (Double sample : samples) {
+                Double newSample = alpha * sample + (1-alpha) * prevSample;
+                newSamples.add(newSample);
+                prevSample = newSample;
+            }
+            samples = newSamples;
+        }
+    }
+
+    public void highpass(int feedback) {
+
+        Wave lowpass = this.copy();
+        lowpass.lowpass(feedback);
+        this.subtract(lowpass);
+    }
+
+    public void downsample(double factor) {
+
+        List<Double> newSamples = new ArrayList<Double>();
+
+        for (int i=0; i<size(); i++) {
+            int refIndex = new Double(i/factor).intValue();
+            refIndex = new Double(refIndex*factor).intValue();
+            newSamples.add(samples.get(refIndex));
+        }
+
+        samples = newSamples;
+    }
+
+    public void sync(int cycleLength) {
+
+        int syncLength = size(); // NB: assumes the current wave is a single cycle
+        List<Double> newSamples = new ArrayList<Double>();
+
+        for (int i=0; i<cycleLength; i++) {
+            newSamples.add(samples.get(i % syncLength));
+        }
+        samples = newSamples;
+    }
+
+    public Wave copy() {
+        Wave wave = new Wave();
+
+        for (Double sample : samples) {
+            wave.addSample(sample);
+        }
+
+        return wave;
+    }
+
+    public double[] toDoubleArray() {
+
+        double max = Math.pow((long)2,(long)DEFAULT_BIT_DEPTH);
+
+        double[] doubles = new double[samples.size()];
+        for (int i=0; i<samples.size(); i++) {
+            Double sample = samples.get(i);
+            doubles[i] = sample;
+        }
+
+        return doubles;
+    }
+
+//    public String toString() {
+//        String s = "";
+//        for (Double sample : samples) {
+//            s += sample + "\n";
+//        }
+//        return s;
+//    }
+
+    //////////////////////////////////////////////////////////
+    // static methods
+    public static Wave load(String filename) {
+
+        Wave wave = new Wave();
+
+        try {
+            BufferedReader in = new BufferedReader(new FileReader(filename));
+            String line;
+            while ((line = in.readLine()) != null)   {
+                Double value = Double.valueOf(line);
+                wave.addSample(value);
+            }
+            in.close();
+
+            return wave;
+        } catch (IOException e) {
+            System.err.println("Unable to load Wave from " + filename);
+            return null;
+        }
+    }
+
+    public static int note2Samples(int semitones, int sampleRate) {
+
+        double noteFrequency = A440_FREQUENCY * Math.pow(SINGLE_STEP_FREQUENCY,semitones);
+        int samples = new Double((double)sampleRate / noteFrequency).intValue();
+
+        return samples;
+    }
+
+    public static int noteToCycleLength(String note) {
+
+        char key = note.toUpperCase().charAt(0);
+        int keyOffset = (int)key - (int)'A';
+        int octave = new Integer(note.substring(1));
+        int semitones = (octave-4)*12 + keyOffset;
+
+        double noteFrequency = A440_FREQUENCY * Math.pow(SINGLE_STEP_FREQUENCY,semitones);
+        return new Double((double)DEFAULT_SAMPLE_RATE / noteFrequency).intValue();
+    }
+
+
+    public static Wave loadWave(String filename, int bitDepth, int sampleRate) {
+
+        Wave wave = new Wave();
+
+//        int totalFramesRead = 0;
+//        File fileIn = new File(filename);
+//        try {
+//            AudioInputStream audioInputStream =
+//            AudioSystem.getAudioInputStream(fileIn);
+//            int bytesPerFrame =
+//                audioInputStream.getFormat().getFrameSize();
+//            if (bytesPerFrame == AudioSystem.NOT_SPECIFIED) {
+//                bytesPerFrame = 1;
+//            }
+//
+//            int numBytes = 1024 * bytesPerFrame;
+//            byte[] audioBytes = new byte[numBytes];
+//            try {
+//                int numBytesRead = 0;
+//                int numFramesRead = 0;
+//                while ((numBytesRead = audioInputStream.read(audioBytes)) != -1) {
+//                    numFramesRead = numBytesRead / bytesPerFrame;
+//                    totalFramesRead += numFramesRead;
+//                    for (int i=0; i<numBytesRead; i++) {
+//                        wave.add(numBytes[i]);
+//                    }
+//                }
+//            } catch (Exception ex) {
+//                // Handle the error...
+//            }
+//        } catch (Exception e) {
+//            // Handle the error...
+//        }
+
+        return wave;
+    }
+
+    public static Wave waveform(int length, String type) {
+        Wave wave = new Wave();
+
+        if (type.equals("saw")) {
+            wave = Wave.saw(length);
+        } else if (type.equals("sine")) {
+            wave = Wave.sine(length);
+        } else if (type.equals("square")) {
+            wave = Wave.square(length);
+        } else if (type.equals("pulse")) {
+            wave = Wave.pulse(length,0.1);
+        } else if (type.equals("random")) {
+            wave = Wave.random(length);
+        }
+
+        return wave;
+    }
+    
+    public static Wave silence(int length) {
+        Wave wave = new Wave();
+        for (int i=0; i<length; i++) {
+            wave.addSample(0.0);
+        }
+        return wave;
+    }
+
+    public static Wave saw(int length) {
+        Wave wave = new Wave();
+        for (int i=0; i<length; i++) {
+            wave.addSample(1.0 - 2.0*i/length);
+        }
+        return wave;
+    }
+
+    public static Wave pulse(int length, double pulseWidth) {
+        Wave wave = new Wave();
+        int i;
+        for (i=0; i<length*pulseWidth; i++) {
+            wave.addSample(1.0);
+        }
+        for (; i<length; i++) {
+            wave.addSample(-1.0);
+        }
+        return wave;
+    }
+
+    public static Wave square(int length) {
+        return Wave.pulse(length,0.5);
+    }
+
+    public static Wave sine(int length) {
+        Wave wave = new Wave();
+        for (int i=0; i<length; i++) {
+            double angleInRadians = (double)i/length * 2*Math.PI;
+            wave.addSample(Math.sin(angleInRadians));
+        }
+        return wave;
+    }
+
+    public static Wave random(int length) {
+        Wave wave = new Wave();
+        for (int i=0; i<length; i++) {
+            wave.addSample(Math.random() * 2 - 1);
+        }
+        return wave;
+    }
+
+    public static Wave average(Wave wave1, Wave wave2, double weight) {
+
+        Wave wave = new Wave();
+        int length = Math.min(wave1.size(),wave2.size());
+        for (int i=0; i<length; i++) {
+            double sample = (weight*wave1.getSample(i) + (1-weight)*wave2.getSample(i));
+            wave.addSample(sample);
+        }
+
+        return wave;
+    }
+
+    public static Wave morph(Wave wave1, Wave wave2, int length, int cycleLength) {
+
+        Wave wave = new Wave();
+        int i=0;
+        while (i < length) {
+            double weight = (double)i/length;
+            for (int j=0; j<cycleLength; j++) {
+                double sample = ((1-weight)*wave1.getSample(j) + weight*wave2.getSample(j));
+                wave.addSample(sample);
+                i++;
+            }
+        }
+
+        return wave;
+    }
+
+
+
+}
