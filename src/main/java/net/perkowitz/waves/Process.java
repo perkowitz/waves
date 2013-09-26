@@ -13,9 +13,13 @@ import java.util.List;
 
 public class Process {
 
+    // JSON keys
     private static final String PROCESS_KEY = "process";
     private static final String INPUTS_KEY = "inputs";
     private static final String PARAMETERS_KEY = "parameters";
+
+    private static final String RAW_FILE_SUFFIX = ".snc";
+    private static final String WAV_FILE_SUFFIX = ".wav";
 
     private static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -26,6 +30,10 @@ public class Process {
 
         if (args.length < 2) {
             System.out.println("Usage: Process <process file> <note> <out file> [infile] [infile] ...");
+            System.out.println("\nExamples:");
+            System.out.println("  Process saw.json A3 saw");
+            System.out.println("  Process random.json A3 random");
+            System.out.printf("  Process morph.json A3 morph saw%s random%s",RAW_FILE_SUFFIX,RAW_FILE_SUFFIX);
             return;
         }
 
@@ -42,9 +50,9 @@ public class Process {
 
         Wave wave = parseFromFile(processFile);
 
-        wave.save(outFile + ".snc");
+        wave.save(outFile + RAW_FILE_SUFFIX);
 
-        StdAudio.save(outFile + ".wav",wave.toDoubleArray());
+        StdAudio.save(outFile + WAV_FILE_SUFFIX, wave.toDoubleArray());
 
     }
 
