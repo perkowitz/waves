@@ -1,0 +1,7 @@
+{"process":"morphloop",
+ "inputs":[
+	{"process":"downsample","inputs":[{"process":"sine"}],"parameters":["1"]},
+	{"process":"downsample","inputs":[{"process":"sine"}],"parameters":["19"]}
+	],
+ "parameters":["300000"]
+}

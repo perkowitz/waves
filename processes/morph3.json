@@ -1,0 +1,12 @@
+{"process":"append",
+ "inputs":[
+    {"process":"append",
+     "inputs":[
+         {"process":"morph","inputs":[{"process":"saw"},{"process":"square"}],"parameters":["88200"]},
+         {"process":"morph","inputs":[{"process":"square"},{"process":"pulse","parameters":["0.01"]}],"parameters":["88200"]}
+     ]
+    },
+    {"process":"morph","inputs":[{"process":"pulse","parameters":["0.01"]},{"process":"saw"}],"parameters":["88200"]}
+]
+}
+

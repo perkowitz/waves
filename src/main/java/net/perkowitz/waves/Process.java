@@ -33,7 +33,7 @@ public class Process {
             System.out.println("\nExamples:");
             System.out.println("  Process saw.json A3 saw");
             System.out.println("  Process random.json A3 random");
-            System.out.printf("  Process morph.json A3 morph saw%s random%s",RAW_FILE_SUFFIX,RAW_FILE_SUFFIX);
+            System.out.printf("  Process morph.json A3 morph saw%s random%s\n", RAW_FILE_SUFFIX, RAW_FILE_SUFFIX);
             return;
         }
 
@@ -123,7 +123,7 @@ public class Process {
             return Wave.random(cycleLength);
         } else if (process.equals("silence")) {
             return Wave.silence(cycleLength);
-        } else if (process.equals("file")) {
+        } else if (process.equals("readfile")) {
             return Wave.load(parameters.get(0));
 
             // adjust wave within headroom
@@ -200,6 +200,18 @@ public class Process {
             Wave morph2 = Wave.morph(wave2,wave1,length,cycleLength);
             morph1.append(morph2);
             return morph1;
+
+        // file handling
+        } else if (process.equals("writefile")) {
+            Wave wave = inputs.get(0);
+            String filename = parameters.get(0);
+            try {
+                wave.save(filename);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return wave;
+
         }
 
         System.out.println("Process not found: " + process);
