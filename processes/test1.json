@@ -1,0 +1,5 @@
+{"process":"morph",
+ "inputs":[{"process":"writefile", "inputs": [{"process":"square"}], "parameters":["square.wav"]},
+     {"process":"saw"}],
+ "parameters":["120000"]
+}

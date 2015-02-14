@@ -1,5 +1,2 @@
-{"process":"morph",
- "inputs":[{"process":"writefile", "inputs": [{"process":"square"}], "parameters":["square.wav"]},
-     {"process":"saw"}],
- "parameters":["120000"]
-}
+{"process":"pad", "inputs":[{"process":"square"}], "parameters":["44100"]}
+

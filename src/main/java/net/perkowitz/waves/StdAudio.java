@@ -14,10 +14,13 @@ package net.perkowitz.waves;
  *
  *************************************************************************/
 
-import java.applet.*;
-import java.io.*;
-import java.net.*;
 import javax.sound.sampled.*;
+import java.applet.Applet;
+import java.applet.AudioClip;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  *  <i>Standard audio</i>. This class provides a basic capability for

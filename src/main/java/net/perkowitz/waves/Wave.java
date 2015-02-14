@@ -1,26 +1,30 @@
 package net.perkowitz.waves;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import com.google.common.collect.Lists;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Wave {
 
-    static int DEFAULT_SAMPLE_RATE = 44100;
-    static int DEFAULT_BIT_DEPTH = 15;
-    static int A440_FREQUENCY = 440;                        // reference note
-    static double SINGLE_STEP_FREQUENCY = 1.059463094359;   // 12th root of 2
+    public static int DEFAULT_SAMPLE_RATE = 44100 * 4;
+    public static int DEFAULT_BIT_DEPTH = 15;
+    public static int A440_FREQUENCY = 440;                                 // reference note
+    public static double SINGLE_STEP_FREQUENCY = Math.pow(2.0, 1.0/12.0);   // 12th root of 2 (scale factor for each semitone)
 
     private List<Double> samples;
+    private Double cycleLength = null;
 
     //////////////////////////////////////////////////////////
     // constructor
     public Wave() {
-        samples = new ArrayList<Double>();
+        samples = Lists.newArrayList();
+    }
+
+    public Wave(Double cycleLength) {
+        samples = Lists.newArrayList();
+        this.cycleLength = cycleLength;
     }
 
     //////////////////////////////////////////////////////////
@@ -54,6 +58,8 @@ public class Wave {
     }
 
     public void pad(long length) {
+
+        // TODO: use the fractional cycleLength to adjust the padded wave to proper frequency (need to truncate int cycleLength?)
         List<Double> newSamples = new ArrayList<Double>();
         for (int i=0; i<length; i++) {
             newSamples.add(samples.get(i % size()));
@@ -258,12 +264,19 @@ public class Wave {
         char key = note.toUpperCase().charAt(0);
         int keyOffset = (int)key - (int)'A';
         int octave = new Integer(note.substring(1));
-        int semitones = (octave-4)*12 + keyOffset;
+        int semitonesFromA440 = octave*12 + keyOffset;
 
-        double noteFrequency = A440_FREQUENCY * Math.pow(SINGLE_STEP_FREQUENCY,semitones);
-        return new Double((double)DEFAULT_SAMPLE_RATE / noteFrequency).intValue();
+        return noteToCycleLength(semitonesFromA440);
     }
 
+    public static int noteToCycleLength(int note) {
+
+        int semitonesFromA = (note - 9) - 48;
+
+        double noteFrequency = A440_FREQUENCY * Math.pow(SINGLE_STEP_FREQUENCY,semitonesFromA);
+        double samples = (double)DEFAULT_SAMPLE_RATE / noteFrequency;
+        return (int)Math.round(samples);
+    }
 
     public static Wave loadWave(String filename, int bitDepth, int sampleRate) {
 
