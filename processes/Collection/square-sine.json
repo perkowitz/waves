@@ -1,4 +1,4 @@
-{"process":"morph",
+{"process":"morphloop",
  "inputs":[{"process":"square"},{"process":"sine"}],
- "parameters":["88200"]
+ "parameters":["176400"]
 }
