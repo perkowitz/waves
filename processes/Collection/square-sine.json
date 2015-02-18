@@ -1,0 +1,4 @@
+{"process":"morph",
+ "inputs":[{"process":"square"},{"process":"sine"}],
+ "parameters":["88200"]
+}

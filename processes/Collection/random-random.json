@@ -1,0 +1,4 @@
+{"process":"morphloop",
+ "inputs":[{"process":"saw"},{"process":"square"}],
+ "parameters":["176400"]
+}

@@ -1,0 +1,4 @@
+{"process":"pad",
+ "inputs":[{"process":"sine"}],
+ "parameters":["88100"]
+}

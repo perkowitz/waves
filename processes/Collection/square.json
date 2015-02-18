@@ -1,0 +1,4 @@
+{"process":"pad",
+ "inputs":[{"process":"square"}],
+ "parameters":["88100"]
+}

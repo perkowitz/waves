@@ -1,0 +1,4 @@
+{"process":"pad",
+ "inputs":[{"process":"pulse", "parameters":["0.1"]}],
+ "parameters":["88100"]
+}

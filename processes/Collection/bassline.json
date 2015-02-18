@@ -1,0 +1,7 @@
+{"process":"append",
+    "inputs":[{"process":"morph",
+                "inputs":[{"process":"square"},{"process":"sine"}],
+                "parameters":["22050"]},
+              {"process":"pad", "inputs":[{"process":"sine"}], "parameters":["88100"]}
+                ]
+}
