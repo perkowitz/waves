@@ -89,6 +89,10 @@ public class Process {
             Integer syncCycleLength = Wave.note2Samples(new Integer(parameters.get(0)),Wave.DEFAULT_SAMPLE_RATE);
             wave.sync(syncCycleLength);
             return wave;
+        } else if (operation.equals("phase")) {
+            Wave wave = inputWaves.get(0);
+            wave.phase(new Integer(parameters.get(0)), new Double(parameters.get(1)), new Long(parameters.get(2)));
+            return wave;
         } else if (operation.equals("lpf")) {
             Wave wave = inputWaves.get(0);
             wave.lowpass(new Integer(parameters.get(0)));

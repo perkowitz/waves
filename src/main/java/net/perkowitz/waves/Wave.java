@@ -198,6 +198,26 @@ public class Wave {
         samples = newSamples;
     }
 
+    public void phase(int phaseCycle, double dryWeight, long length) {
+
+        // TODO allow this to be specified in terms of a fixed number of cycles to go 360 degrees (e.g. increment offset per cycle)
+
+        int size = size();
+        int offset = 0;
+        List<Double> newSamples = new ArrayList<Double>();
+        for (int i=0; i<length; i++) {
+            Double original = samples.get(i % size);
+            Double phased = samples.get((i + offset) % size);
+            newSamples.add(original*dryWeight + phased*(1-dryWeight));
+
+            if (i % phaseCycle == 0) {
+                offset += 1;
+            }
+        }
+        samples = newSamples;
+    }
+
+
     public Wave copy() {
         Wave wave = new Wave();
 
