@@ -7,7 +7,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-/**
+/** Waveform
+ *
+ * Represents a single-cycle waveform. No pitch info.
+ *
  * Created by mikep on 2/18/15
  */
 public class Waveform extends Tone {
@@ -121,7 +124,7 @@ public class Waveform extends Tone {
         return this.reduce();
     }
 
-    /*** Combine multiple tones ***********************************************/
+    /*** Combine multiple waveforms ***********************************************/
 
     public Waveform add(Waveform waveform) {
         return (Waveform)super.add(waveform);
@@ -198,7 +201,7 @@ public class Waveform extends Tone {
         return waveform;
     }
 
-    public static Waveform random(Long seed) {
+    public static Waveform random(Long seed, int granularity) {
 
         Random random;
         if (seed == null) {
@@ -209,12 +212,21 @@ public class Waveform extends Tone {
 
         Waveform waveform = new Waveform();
 
-        for (int index=0; index<waveform.getSize(); index++) {
+        for (int index=0; index<waveform.getSize(); index += granularity) {
             waveform.samples.set(index, random.nextDouble()*2 - 1);
         }
 
         return waveform;
     }
 
+    public static Waveform mix(Waveform waveform1, Waveform waveform2, double weight1) {
+
+        Waveform waveform = new Waveform();
+        for (int index=0; index<waveform1.getSize(); index++) {
+            waveform.samples.add(waveform1.get(index)*weight1 + waveform2.get(index)*(1-weight1));
+        }
+
+        return waveform;
+    }
 
 }

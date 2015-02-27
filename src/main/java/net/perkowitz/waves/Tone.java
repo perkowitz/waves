@@ -2,9 +2,13 @@ package net.perkowitz.waves;
 
 import com.google.common.collect.Lists;
 
+import java.io.File;
 import java.util.List;
 
-/**
+/** Tone
+ *
+ * Represents an audible tone, with sampling rate, pitch, etc
+ *
  * Created by mikep on 2/18/15
  */
 public class Tone {
@@ -162,8 +166,6 @@ public class Tone {
         return this;
     }
 
-
-
     /*** Static utilities ***********************************************/
 
     public static double noteToCycleLength(int note) {
@@ -172,21 +174,24 @@ public class Tone {
         return (double)DEFAULT_SAMPLE_RATE / noteFrequency;
     }
 
+    public static int computeToneLength(int note, double seconds, boolean endAtWaveformCycle) {
+        double cycleLength = Tone.noteToCycleLength(note);
+        int length = (int)(seconds * DEFAULT_SAMPLE_RATE);
+        if (endAtWaveformCycle) {
+            length += cycleLength - (length % cycleLength);
+        }
+        return length;
+    }
 
     /*** Static builders ***********************************************/
 
     public static Tone fromWaveform(Waveform waveform, int note, double seconds, boolean endAtWaveformCycle) {
 
         double cycleLength = Tone.noteToCycleLength(note);
-        int size = (int)(seconds * DEFAULT_SAMPLE_RATE);
-        if (endAtWaveformCycle) {
-            size += cycleLength - (size % cycleLength);
-        }
-        System.out.printf("fromWaveform: cycle=%f, size=%d\n", cycleLength, size);
+        int length = computeToneLength(note, seconds, endAtWaveformCycle);
 
         Tone tone = new Tone();
-
-        for (int index=0; index<size; index++) {
+        for (int index=0; index<length; index++) {
             double waveformIndex = index % cycleLength;
             tone.samples.add(waveform.getByPosition(waveformIndex / cycleLength));
         }
@@ -194,6 +199,27 @@ public class Tone {
         return tone;
     }
 
+    public static Tone morph(List<Waveform> waveforms, int note, double seconds, boolean endAtWaveformCycle) {
 
+        double cycleLength = Tone.noteToCycleLength(note);
+        int length = computeToneLength(note, seconds, endAtWaveformCycle);
+
+        Tone tone = new Tone();
+        for (int waveIndex = 0; waveIndex < waveforms.size()-1; waveIndex++) {
+            Waveform currentWave = waveforms.get(waveIndex);
+            Waveform nextWave = waveforms.get(waveIndex + 1);
+
+            for (int index=0; index<length; index++) {
+                double weight = 1 - ((double)index / length);
+                double waveformIndex = index % cycleLength;
+                double value = currentWave.getByPosition(waveformIndex / cycleLength) * weight +
+                        nextWave.getByPosition(waveformIndex / cycleLength) * (1-weight);
+                tone.samples.add(value);
+            }
+
+        }
+
+        return tone;
+    }
 
 }

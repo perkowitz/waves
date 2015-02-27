@@ -1,26 +1,35 @@
 package net.perkowitz.waves;
 
+import com.google.common.collect.Lists;
+
 import java.io.IOException;
+import java.util.List;
 
 
 public class WaveTone {
 
     public static void main(String args[]) throws IOException {
 
-        Waveform.setDefaultSize(1000);
-        double[] harmonicWeights = { 1, .5, .25, .125, .0625, 0.03125, 0.015625 };
-        Waveform waveform1 = Waveform.sine().addHarmonics(harmonicWeights);
-        Waveform waveform2 = Waveform.sine();
+        int harmonics = 100;
+        double[] harmonicWeights = new double[harmonics];
+        double weight = 1;
+        for (int i=0; i<harmonics; i++) {
+            harmonicWeights[i] = weight;
+            weight = weight * 0.7;
+        }
 
+//        int granularity = 10;
+//        List<Waveform> waveforms = Lists.newArrayList();
+//        waveforms.add(Waveform.square());
+//        waveforms.add(Waveform.random(100l, granularity));
+//        waveforms.add(Waveform.random(101l, granularity));
+//        waveforms.add(Waveform.random(102l, granularity));
+//        waveforms.add(Waveform.random(100l, granularity));
+//        Tone.morph(waveforms, 24, 2, true).toWavFile("whatever24.wav");
+//        Tone.morph(waveforms, 36, 2, true).toWavFile("whatever36.wav");
+//        Tone.morph(waveforms, 48, 2, true).toWavFile("whatever48.wav");
 
-        Tone tone1 = Tone.fromWaveform(waveform1, 36, 4, true);
-//        Tone tone2 = Tone.fromWaveform(waveform2, 36, 2, true);
-//        tone1.add(tone2);
-//        tone1.reduce();
-//        System.out.println(tone1);
-
-        tone1.toWavFile("whatever.wav");
-
+        Tone.morph(Lists.newArrayList(Waveform.square(), Waveform.sine().scaleFrequency(1.1)), 36, 4, true).toWavFile("w36.wav");
 
     }
 
