@@ -1,4 +1,6 @@
-package net.perkowitz.waves;
+package net.perkowitz.waves.apps;
+
+import net.perkowitz.waves.Wave;
 
 import java.io.IOException;
 
@@ -14,7 +16,7 @@ public class Sonic {
         String waveform = args[0];
         Integer semitones = new Integer(args[1]);
 
-        int cycleLength = Wave.note2Samples(semitones,Wave.DEFAULT_SAMPLE_RATE);
+        int cycleLength = Wave.note2Samples(semitones, Wave.DEFAULT_SAMPLE_RATE);
 
 //        Wave wave = Wave.waveform(cycleSize,waveform);
 //        Wave sync = wave.copy();

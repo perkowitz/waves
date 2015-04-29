@@ -1,5 +1,6 @@
-package net.perkowitz.waves;
+package net.perkowitz.waves.apps;
 
+import net.perkowitz.waves.Wave;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;

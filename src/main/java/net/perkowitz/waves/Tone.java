@@ -2,7 +2,6 @@ package net.perkowitz.waves;
 
 import com.google.common.collect.Lists;
 
-import java.io.File;
 import java.util.List;
 
 /** Tone
@@ -50,13 +49,13 @@ public class Tone {
     }
 
 
-    public int getSize() {
+    public int size() {
         return samples.size();
     }
 
     // returns value by index
     public double get(int index) {
-        if (index >= 0 && index < getSize()) {
+        if (index >= 0 && index < size()) {
             return samples.get(index);
         }
 
@@ -67,7 +66,7 @@ public class Tone {
     public Tone copy() {
 
         Tone tone = new Tone();
-        for (int index = 0; index < getSize(); index++) {
+        for (int index = 0; index < size(); index++) {
             tone.samples.add(get(index));
         }
 
@@ -97,7 +96,7 @@ public class Tone {
     /*** Process single tone ***********************************************/
 
     public Tone scale(double scalingFactor) {
-        for (int index=0; index<getSize(); index++) {
+        for (int index=0; index< size(); index++) {
             samples.set(index, samples.get(index) * scalingFactor);
         }
 
@@ -107,7 +106,7 @@ public class Tone {
     public Tone reduce() {
 
         double max = 0d;
-        for (int index=0; index<getSize(); index++) {
+        for (int index=0; index< size(); index++) {
             double abs = Math.abs(samples.get(index));
             if (abs > max) {
                 max = abs;
@@ -118,7 +117,7 @@ public class Tone {
     }
 
     public Tone clip() {
-        for (int index=0; index<getSize(); index++) {
+        for (int index=0; index< size(); index++) {
             if (samples.get(index) > 1) {
                 samples.set(index, 1d);
             } else if (samples.get(index) < -1) {
@@ -215,7 +214,7 @@ public class Tone {
     public static Tone fromWaveformSamples(Waveform waveform) {
 
         Tone tone = new Tone();
-        for (int index=0; index<waveform.getSize(); index++) {
+        for (int index=0; index<waveform.size(); index++) {
             tone.samples.add(waveform.get(index));
         }
 

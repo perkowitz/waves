@@ -1,6 +1,8 @@
-package net.perkowitz.waves;
+package net.perkowitz.waves.apps;
 
 import com.google.common.collect.Lists;
+import net.perkowitz.waves.Tone;
+import net.perkowitz.waves.Waveform;
 
 import java.io.IOException;
 import java.util.List;

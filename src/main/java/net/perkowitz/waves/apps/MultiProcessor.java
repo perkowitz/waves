@@ -1,6 +1,8 @@
-package net.perkowitz.waves;
+package net.perkowitz.waves.apps;
 
 import com.google.common.collect.Lists;
+import net.perkowitz.waves.*;
+import net.perkowitz.waves.Process;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.File;
@@ -65,7 +67,7 @@ public class MultiProcessor {
     private static void processFile(String processFile, String outStem, int lowNote, int highNote, int skip) {
 
         System.out.printf("Processing %s to %s\n", processFile, outStem);
-        Process process = Process.parseFromFile(processFile);
+        net.perkowitz.waves.Process process = Process.parseFromFile(processFile);
         for (int note=lowNote; note <= highNote; note+=skip) {
             System.out.printf("Rendering note: %d\n", note);
             Wave wave = process.apply(note);

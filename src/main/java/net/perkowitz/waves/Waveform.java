@@ -35,7 +35,7 @@ public class Waveform extends Tone {
     // returns value by index with interpolation
     public double get(double index) {
 
-        if (index >= 0 && index < getSize()) {
+        if (index >= 0 && index < size()) {
             int leftIndex = (int)Math.floor(index);
             int rightIndex = (int)Math.ceil(index);
 
@@ -55,14 +55,14 @@ public class Waveform extends Tone {
 
     // returns value by position within waveform (0=start, 1=end)
     public double getByPosition(double position) {
-        return get(getSize() * position);
+        return get(size() * position);
     }
 
 
     public Waveform copy() {
 
         Waveform waveform = new Waveform();
-        for (int index = 0; index < getSize(); index++) {
+        for (int index = 0; index < size(); index++) {
             waveform.samples.set(index,get(index));
         }
 
@@ -93,9 +93,9 @@ public class Waveform extends Tone {
     public Waveform phase(double position) {
 
         List<Double> newSamples = Lists.newArrayList();
-        int offset = (int)(getSize()*position);
-        for (int index = 0; index < getSize(); index++) {
-            newSamples.add(get((index + offset) % getSize()));
+        int offset = (int)(size()*position);
+        for (int index = 0; index < size(); index++) {
+            newSamples.add(get((index + offset) % size()));
         }
         samples = newSamples;
 
@@ -105,8 +105,8 @@ public class Waveform extends Tone {
     public Waveform scaleFrequency(double frequencyMultiplier) {
 
         List<Double> newSamples = Lists.newArrayList();
-        for (int index = 0; index < getSize(); index++) {
-            newSamples.add(get((index*frequencyMultiplier) % getSize()));
+        for (int index = 0; index < size(); index++) {
+            newSamples.add(get((index*frequencyMultiplier) % size()));
         }
         samples = newSamples;
 
@@ -161,8 +161,8 @@ public class Waveform extends Tone {
 
         Waveform waveform = new Waveform();
 
-        double increment = 2 / (double)waveform.getSize();
-        for (int index=0; index<waveform.getSize(); index++) {
+        double increment = 2 / (double)waveform.size();
+        for (int index=0; index<waveform.size(); index++) {
             waveform.samples.set(index, index*increment - 1);
         }
 
@@ -177,12 +177,12 @@ public class Waveform extends Tone {
 
         Waveform waveform = new Waveform();
 
-        int split = (int)Math.round(waveform.getSize() * pulseWidth);
+        int split = (int)Math.round(waveform.size() * pulseWidth);
 
         for (int index=0; index<split; index++) {
             waveform.samples.set(index, 1d);
         }
-        for (int index=split; index<waveform.getSize(); index++) {
+        for (int index=split; index<waveform.size(); index++) {
             waveform.samples.set(index, -1d);
         }
 
@@ -193,8 +193,8 @@ public class Waveform extends Tone {
 
         Waveform waveform = new Waveform();
 
-        for (int index=0; index<waveform.getSize(); index++) {
-            double angleInRadians = (double)index/waveform.getSize() * 2*Math.PI;
+        for (int index=0; index<waveform.size(); index++) {
+            double angleInRadians = (double)index/waveform.size() * 2*Math.PI;
             waveform.samples.set(index, Math.sin(angleInRadians));
         }
 
@@ -212,7 +212,7 @@ public class Waveform extends Tone {
 
         Waveform waveform = new Waveform();
 
-        for (int index=0; index<waveform.getSize(); index += granularity) {
+        for (int index=0; index<waveform.size(); index += granularity) {
             waveform.samples.set(index, random.nextDouble()*2 - 1);
         }
 
@@ -222,7 +222,7 @@ public class Waveform extends Tone {
     public static Waveform mix(Waveform waveform1, Waveform waveform2, double weight1) {
 
         Waveform waveform = new Waveform();
-        for (int index=0; index<waveform1.getSize(); index++) {
+        for (int index=0; index<waveform1.size(); index++) {
             waveform.samples.add(waveform1.get(index)*weight1 + waveform2.get(index)*(1-weight1));
         }
 
