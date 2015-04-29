@@ -13,14 +13,18 @@ import java.util.List;
  */
 public class Tone {
 
-    public static int DEFAULT_SAMPLE_RATE = 44100; //44100;
+    public static int DEFAULT_SAMPLE_RATE = 44100;
     public static int DEFAULT_BIT_DEPTH = 15;
     public static int A440_FREQUENCY = 440;                                 // reference note
     public static double SINGLE_STEP_FREQUENCY = Math.pow(2.0, 1.0/12.0);   // 12th root of 2 (scale factor for each semitone)
 
+    private static int sampleRate = DEFAULT_SAMPLE_RATE;
+    private static int bitDepth = DEFAULT_BIT_DEPTH;
+
     protected List<Double> samples;
 
-    /*** Constructor ***********************************************/
+
+    /*** Constructors ***********************************************/
 
     public Tone() {
         samples = Lists.newArrayList();
@@ -73,7 +77,7 @@ public class Tone {
 
     private double[] toDoubleArray() {
 
-        double max = Math.pow((long)2,(long)DEFAULT_BIT_DEPTH);
+        double max = Math.pow((long)2,(long)bitDepth);
 
         double[] doubles = new double[samples.size()];
         for (int i=0; i<samples.size(); i++) {
@@ -168,15 +172,23 @@ public class Tone {
 
     /*** Static utilities ***********************************************/
 
+    public static void setSampleRate(int sampleRate) {
+        Tone.sampleRate = sampleRate;
+    }
+
+    public static void setBitDepth(int bitDepth) {
+        Tone.bitDepth = bitDepth;
+    }
+
     public static double noteToCycleLength(int note) {
         int semitonesFromA = (note - 9) - 48;
         double noteFrequency = A440_FREQUENCY * Math.pow(SINGLE_STEP_FREQUENCY,semitonesFromA);
-        return (double)DEFAULT_SAMPLE_RATE / noteFrequency;
+        return (double)sampleRate / noteFrequency;
     }
 
     public static int computeToneLength(int note, double seconds, boolean endAtWaveformCycle) {
         double cycleLength = Tone.noteToCycleLength(note);
-        int length = (int)(seconds * DEFAULT_SAMPLE_RATE);
+        int length = (int)(seconds * sampleRate);
         if (endAtWaveformCycle) {
             length += cycleLength - (length % cycleLength);
         }
@@ -194,6 +206,17 @@ public class Tone {
         for (int index=0; index<length; index++) {
             double waveformIndex = index % cycleLength;
             tone.samples.add(waveform.getByPosition(waveformIndex / cycleLength));
+        }
+
+        return tone;
+    }
+
+    // creates a tone where one audio sample corresponds to one waveform sample
+    public static Tone fromWaveformSamples(Waveform waveform) {
+
+        Tone tone = new Tone();
+        for (int index=0; index<waveform.getSize(); index++) {
+            tone.samples.add(waveform.get(index));
         }
 
         return tone;
