@@ -1,4 +1,4 @@
-package net.perkowitz.waves;
+package net.perkowitz.waves.old;
 
 import com.google.common.collect.Lists;
 import org.codehaus.jackson.JsonNode;

@@ -1,10 +1,8 @@
-package net.perkowitz.waves.apps;
+package net.perkowitz.waves.old.apps;
 
-import net.perkowitz.waves.Wave;
-import org.codehaus.jackson.map.ObjectMapper;
+import net.perkowitz.waves.old.Wave;
 
 import java.io.IOException;
-import java.util.List;
 
 
 public class Cycles {

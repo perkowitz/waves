@@ -7,7 +7,7 @@ import net.perkowitz.waves.Wavetable;
 import java.io.IOException;
 
 
-public class Wavetable {
+public class WavetableMaker {
 
     public static void main(String args[]) throws IOException {
 

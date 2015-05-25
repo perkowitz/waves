@@ -1,6 +1,6 @@
-package net.perkowitz.waves.apps;
+package net.perkowitz.waves.old.apps;
 
-import net.perkowitz.waves.Wave;
+import net.perkowitz.waves.old.Wave;
 
 import java.io.IOException;
 

@@ -1,12 +1,10 @@
-package net.perkowitz.waves.apps;
+package net.perkowitz.waves.old.apps;
 
 import net.perkowitz.waves.*;
-import net.perkowitz.waves.Process;
-import org.codehaus.jackson.JsonNode;
+import net.perkowitz.waves.old.Process;
+import net.perkowitz.waves.old.Wave;
 import org.codehaus.jackson.map.ObjectMapper;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
@@ -38,7 +36,7 @@ public class Processor {
         Integer note = new Integer(args[1]);
         String outFile = args[2] + "_" + note;
 
-        net.perkowitz.waves.Process process = Process.parseFromFile(processFile);
+        Process process = Process.parseFromFile(processFile);
         Wave wave = process.apply(note);
 
         wave.save(outFile + RAW_FILE_SUFFIX);
