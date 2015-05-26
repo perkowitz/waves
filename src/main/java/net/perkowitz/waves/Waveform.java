@@ -70,6 +70,14 @@ public class Waveform extends Tone {
         return waveform;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     /*** Process single waveform ***********************************************/
 
     public Waveform name(String name) {
@@ -136,7 +144,7 @@ public class Waveform extends Tone {
     }
 
 
-    /*** Combine multiple waveforms ***********************************************/
+    /*** Combine multiple waves ***********************************************/
 
     public Waveform add(Waveform waveform) {
         return (Waveform)super.add(waveform);

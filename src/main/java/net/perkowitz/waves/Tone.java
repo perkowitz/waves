@@ -214,28 +214,28 @@ public class Tone {
 
     public Tone add(Tone tone) {
         for (int index=0; index<samples.size(); index++) {
-            samples.set(index, samples.get(index) + tone.samples.get(index));
+            samples.set(index, samples.get(index) + tone.get(index));
         }
         return this;
     }
 
     public Tone subtract(Tone tone) {
         for (int index=0; index<samples.size(); index++) {
-            samples.set(index, samples.get(index) - tone.samples.get(index));
+            samples.set(index, samples.get(index) - tone.get(index));
         }
         return this;
     }
 
     public Tone multiply(Tone tone) {
         for (int index=0; index<samples.size(); index++) {
-            samples.set(index, samples.get(index) * tone.samples.get(index));
+            samples.set(index, samples.get(index) * tone.get(index));
         }
         return this;
     }
 
     public Tone multiply2(Tone tone) {
         for (int index=0; index<samples.size(); index++) {
-            double absValue = Math.abs(samples.get(index) * tone.samples.get(index));
+            double absValue = Math.abs(samples.get(index) * tone.get(index));
             double mult = 1;
             if (samples.get(index) < 0) {
                 mult = -1;
@@ -327,7 +327,7 @@ public class Tone {
 
         for (Integer interval : intervals) {
             int note = root + interval;
-            Tone tone = Tone.morph(waveforms, note, seconds, false);
+            Tone tone = Tone.morph(waveforms, note, seconds, true);
             if (chord == null) {
                 chord = tone.copy();
             } else {

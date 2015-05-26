@@ -17,7 +17,9 @@ import java.util.Map;
 
 public class GenerateVX8 {
 
+    private static int[] singleNote = new int[] {48};
     private static int[] basicNotes = new int[] {24, 36, 48};
+    private static int[] chordNotes = new int[] {48, 60};
 
     public static void main(String args[]) throws IOException {
 
@@ -25,9 +27,9 @@ public class GenerateVX8 {
         File root = new File(rootPath);
         root.mkdirs();
 
-        VX8.createWaves(rootPath + "/waves", basicNotes);
+        VX8.createWaves(rootPath + "/waves", singleNote);
         VX8.createMorphs(rootPath + "/morphs", VX8.morphs, basicNotes);
-        VX8.createChords(rootPath + "/chords", VX8.chords, null);
+        VX8.createChords(rootPath + "/chords", VX8.chords, VX8.chordMorphs, chordNotes);
 
     }
 
