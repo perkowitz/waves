@@ -17,9 +17,10 @@ public class Waveform extends Tone {
 
     private static int defaultSize = 1000; //1000;
     private boolean useInterpolation = true;
+    protected String name = "waveform";
 
 
-    /*** Basic methods ***********************************************/
+    /*** constructor ***********************************************/
 
     public Waveform() {
         samples = new ArrayList<Double>(Collections.nCopies(defaultSize,0d));
@@ -69,8 +70,12 @@ public class Waveform extends Tone {
         return waveform;
     }
 
-
     /*** Process single waveform ***********************************************/
+
+    public Waveform name(String name) {
+        this.name = name;
+        return this;
+    }
 
     public Waveform scale(double scalingFactor) {
         return (Waveform)super.scale(scalingFactor);
@@ -83,6 +88,12 @@ public class Waveform extends Tone {
     }
     public Waveform normalize() {
         return (Waveform)super.normalize();
+    }
+    public Waveform smooth(int width) {
+        return (Waveform)super.smooth(width);
+    }
+    public Waveform downsample(double factor) {
+        return (Waveform)super.downsample(factor);
     }
 
     public Waveform phase(int degrees) {
@@ -124,6 +135,7 @@ public class Waveform extends Tone {
         return this.reduce();
     }
 
+
     /*** Combine multiple waveforms ***********************************************/
 
     public Waveform add(Waveform waveform) {
@@ -160,6 +172,7 @@ public class Waveform extends Tone {
     public static Waveform saw() {
 
         Waveform waveform = new Waveform();
+        waveform.name = "Saw";
 
         double increment = 2 / (double)waveform.size();
         for (int index=0; index<waveform.size(); index++) {
@@ -170,12 +183,15 @@ public class Waveform extends Tone {
     }
 
     public static Waveform square() {
-        return Waveform.pulse(0.5);
+        Waveform waveform = Waveform.pulse(0.5);
+        waveform.name = "Square";
+        return waveform;
     }
 
     public static Waveform pulse(double pulseWidth) {
 
         Waveform waveform = new Waveform();
+        waveform.name = String.format("Pulse%02d", (int)(pulseWidth*100));
 
         int split = (int)Math.round(waveform.size() * pulseWidth);
 
@@ -192,6 +208,7 @@ public class Waveform extends Tone {
     public static Waveform sine() {
 
         Waveform waveform = new Waveform();
+        waveform.name = "Sine";
 
         for (int index=0; index<waveform.size(); index++) {
             double angleInRadians = (double)index/waveform.size() * 2*Math.PI;
@@ -201,7 +218,7 @@ public class Waveform extends Tone {
         return waveform;
     }
 
-    public static Waveform random(Long seed, int granularity) {
+    public static Waveform random(Long seed, int smoothing) {
 
         Random random;
         if (seed == null) {
@@ -211,10 +228,19 @@ public class Waveform extends Tone {
         }
 
         Waveform waveform = new Waveform();
+        waveform.name = "Rnd";
+        if (seed != null) {
+            waveform.name += seed;
+        }
+        if (smoothing > 1) {
+            waveform.name += "s" + smoothing;
+        }
 
-        for (int index=0; index<waveform.size(); index += granularity) {
+        for (int index=0; index<waveform.size(); index++) {
             waveform.samples.set(index, random.nextDouble()*2 - 1);
         }
+
+        waveform.smooth(smoothing);
 
         return waveform;
     }

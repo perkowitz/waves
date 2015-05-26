@@ -2,17 +2,20 @@ package net.perkowitz.waves;
 
 import java.io.File;
 
-/**
- * Created with IntelliJ IDEA.
- * User: mperkowi
- * Date: 4/29/15
- * Time: 3:59 PM
- * To change this template use File | Settings | File Templates.
+/** Wavetable
+ *
+ * Represents a sequence of waveforms
+ * - an empty position in the table should be interpolated from the waveforms on either side
+ * - the first and last positions must be defined (so something can be interpolated)
+ *
+ * Can be rendered multiple ways
+ * - as a collection of single-cycle waves (for loading individually into a microwave)
+ * - as a single wave file where each waveform appears as one cycle, with the loop point set to one cycle
+ * - as a tone that is a morph through the table over time
+ *
+ * Created by mikep on 4/29/15
  */
 public class Wavetable {
-
-    public static int DEFAULT_SAMPLE_RATE = 44100;
-    public static int DEFAULT_BIT_DEPTH = 8;
 
     private String name;
     private int tableSize;
@@ -37,8 +40,13 @@ public class Wavetable {
         return wavetable[position];
     }
 
+    public Tone renderAsTone(int note, double seconds) {
+
+        return null;
+    }
+
     public void renderAsDir(String path) {
-        // render as individual wav files in a named directory
+        // render as individual single-cycle wav files in a named directory
 
         File dir = new File(path + "/" + name);
         dir.mkdirs();
@@ -54,7 +62,7 @@ public class Wavetable {
     }
 
     public void renderAsFile(String path) {
-        // create a single file with the waves appended (crossfade?) and a loop point set
+        // create a single file with the single-cycle waves appended (crossfade?) and a loop point set
     }
 
 

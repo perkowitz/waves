@@ -2,6 +2,7 @@ package net.perkowitz.waves;
 
 import com.google.common.collect.Lists;
 
+import java.io.File;
 import java.util.List;
 
 /** Tone
@@ -20,7 +21,10 @@ public class Tone {
     private static int sampleRate = DEFAULT_SAMPLE_RATE;
     private static int bitDepth = DEFAULT_BIT_DEPTH;
 
+    private static String fileType = "wav";
+
     protected List<Double> samples;
+    protected String name = "tone";
 
 
     /*** Constructors ***********************************************/
@@ -30,7 +34,18 @@ public class Tone {
     }
 
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     /*** Utility ***********************************************/
+
+
+
 
     public String toString() {
 
@@ -62,18 +77,6 @@ public class Tone {
         return 0d;
     }
 
-
-    public Tone copy() {
-
-        Tone tone = new Tone();
-        for (int index = 0; index < size(); index++) {
-            tone.samples.add(get(index));
-        }
-
-        return tone;
-    }
-
-
     private double[] toDoubleArray() {
 
         double max = Math.pow((long)2,(long)bitDepth);
@@ -92,8 +95,32 @@ public class Tone {
         StdAudio.save(filename, toDoubleArray());
     }
 
+    public void toWavFile(File path) {
+        String outputName = path.toString();
+        if (path.isDirectory()) {
+            outputName = path.toString() + "/" + name + "." + fileType;
+        }
+        StdAudio.save(outputName, toDoubleArray());
+    }
+
+
 
     /*** Process single tone ***********************************************/
+
+    public Tone name(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public Tone copy() {
+
+        Tone tone = new Tone();
+        for (int index = 0; index < size(); index++) {
+            tone.samples.add(get(index));
+        }
+
+        return tone;
+    }
 
     public Tone scale(double scalingFactor) {
         for (int index=0; index< size(); index++) {
@@ -130,6 +157,55 @@ public class Tone {
 
     public Tone normalize() {
         // rescale entire wave (bigger or smaller) to fill dynamic range
+
+        Double max = null;
+        Double min = null;
+        List<Double> newSamples = Lists.newArrayList();
+
+        for (int index = 0; index < size(); index++) {
+            if (max == null || samples.get(index) > max) {
+                max = samples.get(index);
+            }
+            if (min == null || samples.get(index) < min) {
+                min = samples.get(index);
+            }
+        }
+
+        Double scale = 1 / max;
+        for (int index = 0; index < size(); index++) {
+            newSamples.add(samples.get(index) * scale);
+        }
+
+        samples = newSamples;
+        return this;
+    }
+
+    public Tone smooth(int width) {
+
+        List<Double> newSamples = Lists.newArrayList();
+        for (int index = 0; index < size()-width; index++) {
+            double total = 0d;
+            for (int window = 0; window < width; window++) {
+                total += samples.get(index + window);
+            }
+            newSamples.add(total / width);
+        }
+        samples = newSamples;
+
+        return this;
+    }
+
+    public Tone downsample(double factor) {
+
+        List<Double> newSamples = Lists.newArrayList();
+        for (int index = 0; index < size(); index++) {
+            int refIndex = new Double(index/factor).intValue();
+            refIndex = new Double(refIndex*factor).intValue();
+            newSamples.add(samples.get(refIndex));
+
+        }
+        samples = newSamples;
+
         return this;
     }
 
@@ -202,6 +278,7 @@ public class Tone {
         int length = computeToneLength(note, seconds, endAtWaveformCycle);
 
         Tone tone = new Tone();
+        tone.name = waveform.getName() + " " + note;
         for (int index=0; index<length; index++) {
             double waveformIndex = index % cycleLength;
             tone.samples.add(waveform.getByPosition(waveformIndex / cycleLength));
@@ -242,6 +319,26 @@ public class Tone {
         }
 
         return tone;
+    }
+
+    public static Tone chord(List<Waveform> waveforms, int root, List<Integer> intervals, double seconds) {
+
+        Tone chord = null;
+
+        for (Integer interval : intervals) {
+            int note = root + interval;
+            Tone tone = Tone.morph(waveforms, note, seconds, false);
+            if (chord == null) {
+                chord = tone.copy();
+            } else {
+                chord.add(tone);
+            }
+        }
+        if (chord != null) {
+            chord.normalize();
+        }
+
+        return chord;
     }
 
 }
