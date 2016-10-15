@@ -27,9 +27,14 @@ public class GenerateVX8 {
         File root = new File(rootPath);
         root.mkdirs();
 
+        System.out.printf("Creating %d waves...\n", VX8.waves.length);
         VX8.createWaves(rootPath + "/waves", singleNote);
+        System.out.printf("Creating %d morphs...\n", VX8.morphs.size());
         VX8.createMorphs(rootPath + "/morphs", VX8.morphs, basicNotes);
+        System.out.printf("Creating %d chords...\n", VX8.chords.keySet().size());
         VX8.createChords(rootPath + "/chords", VX8.chords, VX8.chordMorphs, chordNotes);
+        System.out.printf("Creating %d morph chords...\n", VX8.chords.keySet().size());
+        VX8.createMorphChords(rootPath + "/morph-chords", VX8.chords, VX8.chordMorphs, chordNotes);
 
     }
 

@@ -43,13 +43,24 @@ public class VX8 {
     };
     public static WaveformMap<String,Waveform> waveformMap = new WaveformMap(waves);
 
+    public static Waveform[] chordWaves = new Waveform[] {
+            Waveform.saw().name("Saw"),
+            Waveform.square().name("Square"),
+            Waveform.pulse(0.06).name("Pulse06"),
+            Waveform.random(1l,10).name("Rnd1"),
+            Waveform.sine().downsample(20).name("Sine20")
+    };
+
+
+
     public static List<Morph> morphs = Lists.newArrayList();
     static {
         morphs.add(createMorph("SqrSaw", Lists.newArrayList("Square", "Saw"), true));
         morphs.add(createMorph("SqrSine", Lists.newArrayList("Square", "Sine200", "Sine100"), true));
-        morphs.add(createMorph("Sine", Lists.newArrayList("Sine100", "Sine20"), true));
+        morphs.add(createMorph("Sine", Lists.newArrayList("Sine", "Sine20"), true));
+        morphs.add(createMorph("Sine2", Lists.newArrayList("Sine100", "Sine20"), true));
         morphs.add(createMorph("Rnd", Lists.newArrayList("Rnd1", "Rnd2", "Rnd3", "Rnd4"), true));
-        morphs.add(createMorph("Sweep1", Lists.newArrayList("Sine200", "Pulse10", "Sine20",  "Rnd1"), true));
+        morphs.add(createMorph("Sweep1", Lists.newArrayList("Sine200", "Pulse25", "Sine20",  "Rnd1"), true));
         morphs.add(createMorph("Pulse", Lists.newArrayList("Pulse25", "Pulse10", "Pulse06", "Pulse02"), true));
     }
 
@@ -57,24 +68,25 @@ public class VX8 {
     static {
         chordMorphs.add(createMorph("SqrSaw", Lists.newArrayList("Square", "Saw"), false));
         chordMorphs.add(createMorph("SqrSine", Lists.newArrayList("Square", "Sine200", "Sine100"), false));
-        chordMorphs.add(createMorph("Sine", Lists.newArrayList("Sine100", "Sine20"), false));
+        chordMorphs.add(createMorph("Sine2", Lists.newArrayList("Sine100", "Sine20"), false));
         chordMorphs.add(createMorph("Pulse", Lists.newArrayList("Pulse10", "Pulse02"), false));
+        chordMorphs.add(createMorph("Sweep1", Lists.newArrayList("Sine200", "Pulse25", "Sine20",  "Rnd1"), false));
     }
 
     public static Map<String,Integer[]> chords = Maps.newHashMap();
     static {
         chords.put("Maj", new Integer[] {0, 4, 7});
         chords.put("Min", new Integer[] {0, 3, 7});
-////        chords.put("Aug", new Integer[] {0, 4, 8});
-////        chords.put("Dim", new Integer[] {0, 3, 6});
-//        chords.put("Maj7", new Integer[] {0, 4, 7, 11});
-//        chords.put("Min7", new Integer[] {0, 3, 7, 10});
-////        chords.put("Aug7", new Integer[] {0, 4, 8, 10});
-//        chords.put("Dim7", new Integer[] {0, 3, 6, 9});
-//        chords.put("Maj6", new Integer[] {0, 4, 7, 9});
-//        chords.put("Min6", new Integer[] {0, 3, 7, 9});
-//        chords.put("Sus2", new Integer[] {0, 2, 7});
-////        chords.put("Sus4", new Integer[] {0, 5, 7});
+        chords.put("Aug", new Integer[] {0, 4, 8});
+        chords.put("Dim", new Integer[] {0, 3, 6});
+        chords.put("Maj7", new Integer[] {0, 4, 7, 11});
+        chords.put("Min7", new Integer[] {0, 3, 7, 10});
+        chords.put("Aug7", new Integer[] {0, 4, 8, 10});
+        chords.put("Dim7", new Integer[] {0, 3, 6, 9});
+        chords.put("Maj6", new Integer[] {0, 4, 7, 9});
+        chords.put("Min6", new Integer[] {0, 3, 7, 9});
+        chords.put("Sus2", new Integer[] {0, 2, 7});
+        chords.put("Sus4", new Integer[] {0, 5, 7});
     }
 
     public static void createWaves(String path, int[] notes) {
@@ -112,6 +124,23 @@ public class VX8 {
     }
 
     public static void createChords(String path, Map<String,Integer[]> chords, List<Morph> morphs, int[] notes) {
+
+        File dir = new File(path);
+        dir.mkdirs();
+
+        for (Waveform wave : chordWaves) {
+            for (int note : notes) {
+                for (String name : chords.keySet()) {
+                    Tone chord = Tone.chord(Lists.<Waveform>newArrayList(wave, wave), note, Lists.newArrayList(chords.get(name)), waveformLengthSecs);
+                    chord.setName(CHORD_PREFIX + wave.getName() + PREFIX_SEPARATOR + name + NOTE_SEPARATOR + note);
+                    chord.toWavFile(dir);
+                }
+            }
+        }
+
+    }
+
+    public static void createMorphChords(String path, Map<String,Integer[]> chords, List<Morph> morphs, int[] notes) {
 
         File dir = new File(path);
         dir.mkdirs();
